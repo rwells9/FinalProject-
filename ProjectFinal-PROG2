@@ -1,0 +1,79 @@
+
+package projectfinal;
+import java.util.Scanner;
+import java.io.*;
+/**
+ *
+ * @author bekahwells
+ */
+public class ProjectFinal {
+
+    /**
+     * @param args the command line arguments
+     * @throws java.io.FileNotFoundException
+     */
+    public static void main(String[] args) throws FileNotFoundException {
+       login();
+   }
+        
+    public static void login() throws FileNotFoundException {
+        Scanner inputscanner = new Scanner(System.in);
+        int loginAttempts = 0;
+        String username, password;
+        boolean isLoggedIn = false;
+
+        // Login validation loop with up to 3 attempts
+         {
+            System.out.print("Enter your username: ");
+            username = inputscanner.nextLine();
+            System.out.print("Enter your password: ");
+            password = inputscanner.nextLine();
+            String answer = inputscanner.nextLine();
+        
+         for(loginAttempts = 0; loginAttempts < 3; loginAttempts++){
+             System.out.println("You're in");
+    
+         }
+        }
+    }
+
+        
+        //isLoggedIn = validateCredentials(username, password);
+          // /f (!isLoggedIn) {
+          //   loginAttempts++;
+          //     System.out.println("Login failed. Please try again.");
+            
+      
+
+        //if (!isLoggedIn) {
+         //   System.out.println("Exceeded maximum login attempts. Exiting the program.");
+         //   return;
+       //}
+//        ArrayList<Question> questions = loadQuestions("/Users/bekahwells/Downloads/TestBank.txt/");
+//        Collections.shuffle(questions);
+//        int score = administerQuiz(scanner, questions);
+//        saveReport(username, score);
+//
+//        scanner.close();
+    //}
+
+    // Function to validate user credentials
+    private static boolean validateCredentials(String username, String password) throws FileNotFoundException {
+       try (Scanner userInfoSc = new Scanner(new File("/Users/bekahwells/Downloads/UsersInfo.txt/"))) {
+            while (userInfoSc.hasNextLine()) {
+                String line = userInfoSc.nextLine();
+                String[] parts = line.split("\\s+");
+                if (parts.length >= 2) {
+                    String storedUsername = parts[0];
+                    String storedPassword = parts[1];
+                    if (storedUsername.equalsIgnoreCase(username) && storedPassword.equals(password)) {
+                        return true;
+                    }
+                }
+    userInfoSc.close();
+}
+       }
+       
+    
+   
+    
