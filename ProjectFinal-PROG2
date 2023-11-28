@@ -1,79 +1,144 @@
 
-package projectfinal;
-import java.util.Scanner;
-import java.io.*;
-/**
- *
- * @author bekahwells
- */
-public class ProjectFinal {
+public static void main(String[] args) throws FileNotFoundException, IOException {
+    login();  // Calls the login method to start the program.
+}
 
-    /**
-     * @param args the command line arguments
-     * @throws java.io.FileNotFoundException
-     */
-    public static void main(String[] args) throws FileNotFoundException {
-       login();
-   }
-        
-    public static void login() throws FileNotFoundException {
-        Scanner inputscanner = new Scanner(System.in);
-        int loginAttempts = 0;
-        String username, password;
-        boolean isLoggedIn = false;
+// Global variables
+public static String currentUsername;
+public static double score1;
 
-        // Login validation loop with up to 3 attempts
-         {
-            System.out.print("Enter your username: ");
-            username = inputscanner.nextLine();
-            System.out.print("Enter your password: ");
-            password = inputscanner.nextLine();
-            String answer = inputscanner.nextLine();
-        
-         for(loginAttempts = 0; loginAttempts < 3; loginAttempts++){
-             System.out.println("You're in");
-    
-         }
+// Login method that handles user authentication
+public static void login() throws FileNotFoundException, IOException {
+    Scanner inputScanner = new Scanner(System.in);
+    File usersFile = new File("/Users/bekahwells/Downloads/Usersinfo.txt");
+    Scanner inputSc = new Scanner(usersFile);
+    int MAX_ATTEMPTS = 3;
+    int attempts = 0;
+
+    // Loop for handling login attempts
+    while (attempts < MAX_ATTEMPTS) {
+        // Prompt user for username and password
+        System.out.println("Please enter username: ");
+        String userName = inputScanner.nextLine();
+        System.out.println("Please enter password: ");
+        String password = inputScanner.nextLine();
+
+        // Validate user credentials
+        if (validateCredentials(userName, password)) {
+            currentUsername = userName;
+            quizStart();  // If credentials are valid, start the quiz.
+            break;
+        } else {
+            attempts++;
+            System.out.println("Invalid username or password");
+        }
+
+        // Check for maximum login attempts
+        if (attempts == MAX_ATTEMPTS) {
+            System.out.println("Max login attempts. Exiting program.");
+        }
+        inputSc.close();
+    }
+}
+
+// Method to validate user credentials
+public static boolean validateCredentials(String username, String passWord) throws FileNotFoundException {
+    Scanner userInfoSc = new Scanner(new File("/Users/bekahwells/Downloads/UsersInfo.txt"));
+    while (userInfoSc.hasNextLine()) {
+        // Read user information from file and compare with provided credentials
+        String line = userInfoSc.nextLine();
+        String[] parts = line.split("\\s+");
+        if (parts.length >= 2) {
+            String storedUsername = parts[2];
+            String storedPassword = parts[3];
+            if (storedUsername.equalsIgnoreCase(username) && storedPassword.equals(passWord)) {
+                return true;  // Return true if credentials are valid
+            }
+        }
+    }
+    return false;  // Return false if credentials are invalid
+}
+
+// Method to start the quiz
+public static void quizStart() throws FileNotFoundException, IOException {
+    // Quiz initialization
+    System.out.println("Quiz Started (T/F only)");
+    Scanner input = new Scanner(System.in);
+    int score = 0;
+
+    // Load questions from file
+    String[] questionsBankArr = new String[125];
+    File testBankFile = new File("/Users/bekahwells/Downloads/TestBank.txt");
+    Scanner testBankScanner = new Scanner(testBankFile);
+    int x = 0;
+    while (testBankScanner.hasNext()) {
+        String line = testBankScanner.nextLine();
+        questionsBankArr[x] = line;
+        x++;
+    }
+
+    // Load answers from file
+    String[] answerArr = new String[125];
+    File answersFile = new File("/Users/bekahwells/Downloads/Answers.txt");
+    Scanner answerskScanner = new Scanner(answersFile);
+    x = 0;
+    while (answerskScanner.hasNext()) {
+        String line = answerskScanner.nextLine();
+        answerArr[x] = line;
+        x++;
+    }
+
+    // Quiz loop
+    Random rand = new Random();
+    for (int i = 0; i < 10; i++) {
+        int randQuestNum = rand.nextInt(120);
+        System.out.println("Question " + (i + 1) + ": " + questionsBankArr[randQuestNum]);
+        String answer = input.nextLine().toUpperCase();
+        char correctAns = answerArr[i].charAt(0);
+        boolean isAcceptedAns = answer.equals("T") || answer.equals("F");
+        System.out.println(isAcceptedAns);
+
+        // Validate user input for quiz (T/F only)
+        if (!isAcceptedAns) {
+            System.out.println("Invalid input. T or F only");
+            answer = input.nextLine();
+        }
+        char answerCheck = answer.charAt(0);
+        boolean isRightAnswer = correctAns == answerCheck;
+        if (isRightAnswer) {
+            System.out.println("Correct");
+            score++;
         }
     }
 
-        
-        //isLoggedIn = validateCredentials(username, password);
-          // /f (!isLoggedIn) {
-          //   loginAttempts++;
-          //     System.out.println("Login failed. Please try again.");
-            
-      
-
-        //if (!isLoggedIn) {
-         //   System.out.println("Exceeded maximum login attempts. Exiting the program.");
-         //   return;
-       //}
-//        ArrayList<Question> questions = loadQuestions("/Users/bekahwells/Downloads/TestBank.txt/");
-//        Collections.shuffle(questions);
-//        int score = administerQuiz(scanner, questions);
-//        saveReport(username, score);
-//
-//        scanner.close();
-    //}
-
-    // Function to validate user credentials
-    private static boolean validateCredentials(String username, String password) throws FileNotFoundException {
-       try (Scanner userInfoSc = new Scanner(new File("/Users/bekahwells/Downloads/UsersInfo.txt/"))) {
-            while (userInfoSc.hasNextLine()) {
-                String line = userInfoSc.nextLine();
-                String[] parts = line.split("\\s+");
-                if (parts.length >= 2) {
-                    String storedUsername = parts[0];
-                    String storedPassword = parts[1];
-                    if (storedUsername.equalsIgnoreCase(username) && storedPassword.equals(password)) {
-                        return true;
-                    }
-                }
-    userInfoSc.close();
+    // Save the quiz score
+    score1 = score;
+    Report();  // Generate and display the report.
 }
-       }
-       
+
+// Method to generate and display the quiz report
+public static void Report() throws FileNotFoundException, IOException {
+    // Read user information file
+    File usersFile = new File("/Users/bekahwells/Downloads/Usersinfo.txt");
+    Scanner inputSc = new Scanner(usersFile);
+    String firstName = " ";
+    String lastName = " ";
+
+    // Find user information based on the current username
+    while (inputSc.hasNextLine()) {
+        String[] userInformation = inputSc.nextLine().split("\\s+");
+        if (userInformation[2].equals(currentUsername)) {
+            firstName = userInformation[0];
+            lastName = userInformation[1];
+            break;
+        }
+    }
+
+    // Display the quiz report
+    System.out.println(firstName + " " + lastName + " " + currentUsername + " " + score1 + " ");
     
-   
-    
+    // Write the report to a file
+    PrintWriter printTofile = new PrintWriter(new File(currentUsername + "_CSCI_2493_Quiz"));
+    printTofile.write(firstName + "  " + lastName + "  " + score1 + "  ");
+    printTofile.close();
+}
